@@ -1,0 +1,82 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'HorizontalBarChart',
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('HorizontalBarChart'),
+        ),
+        body: Center(
+          child: HorizontalBarChart(
+            data: [30, 70, 45, 55, 90],
+            labels: ['Category 1', 'Category 2', 'Category 3', 'Category 4', 'Category 5'],
+            maxValue: 100,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class HorizontalBarChart extends StatelessWidget {
+  final List<double> data;
+  final List<String> labels;
+  final double maxValue;
+
+  HorizontalBarChart({required this.data, required this.labels, required this.maxValue});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size(300, 200),
+      painter: HorizontalBarChartPainter(data: data, labels: labels, maxValue: maxValue),
+    );
+  }
+}
+
+class HorizontalBarChartPainter extends CustomPainter {
+  final List<double> data;
+  final List<String> labels;
+  final double maxValue;
+
+  HorizontalBarChartPainter({required this.data, required this.labels, required this.maxValue});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint barPaint = Paint()
+      ..color = Colors.blue
+      ..style = PaintingStyle.fill;
+
+    Paint textPaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+
+    double barHeight = size.height / data.length;
+    double width = size.width;
+
+    for (int i = 0; i < data.length; i++) {
+      double barWidth = (data[i] / maxValue) * width; // Standardization of bar width
+
+      // Draw a rectangle
+      canvas.drawRect(Rect.fromLTWH(0, i * barHeight, barWidth, barHeight - 5), barPaint);
+
+      // Draw text
+      TextSpan span = TextSpan(style: TextStyle(color: Colors.black, fontSize: 14), text: labels[i]);
+      TextPainter tp = TextPainter(text: span, textDirection: TextDirection.ltr);
+      tp.layout();
+      tp.paint(canvas, Offset(barWidth + 5, i * barHeight)); // Move the text to the right of the bar
+    }
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
+  }
+}
